@@ -1,7 +1,6 @@
 package com.example.actividades1_5
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,6 +11,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -57,7 +57,7 @@ fun Actividad1() {
         }
 
         Button(
-            modifier =  Modifier.padding(top = profileBtn(showLoading).dp),
+            modifier = Modifier.padding(top = profileBtn(showLoading).dp),
             onClick = {
                 showLoading = !showLoading
             }
@@ -76,10 +76,10 @@ Modifica ahora también que se separe el botón de la línea de progreso 30 dp,
 pero usando un estado... es decir, cuando no sea visible no quiero que tenga la separación
 aunque no se vea.
 */
-fun profileBtn(showLoading: Boolean): Int{
-    if (showLoading){
+fun profileBtn(showLoading: Boolean): Int {
+    if (showLoading) {
         return 30
-    }else return 0
+    } else return 0
 }
 
 /*
@@ -101,20 +101,20 @@ fun Actividad3() {
 
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
             Button(onClick = {
-                if (progresIndicator + 0.1f <= 1f){
+                if (progresIndicator + 0.1f <= 1f) {
                     progresIndicator += 0.1f
-                }else progresIndicator = 1f}, Modifier.padding(top = 15.dp)) {
+                } else progresIndicator = 1f
+            }, Modifier.padding(top = 15.dp)) {
                 Text(text = "Incrementar")
             }
             Button(onClick = {
-                if (progresIndicator - 0.1f >= 0f){
-                progresIndicator -= 0.1f
-            }else progresIndicator = 0f}, Modifier.padding(top = 15.dp, start = 10.dp)) {
+                if (progresIndicator - 0.1f >= 0f) {
+                    progresIndicator -= 0.1f
+                } else progresIndicator = 0f
+            }, Modifier.padding(top = 15.dp, start = 10.dp)) {
                 Text(text = "Reducir")
             }
         }
-
-        Text("$progresIndicator")
     }
 }
 
@@ -130,10 +130,19 @@ y que no deje escribir más de un punto decimal...
 fun Actividad4() {
     var myVal by rememberSaveable { mutableStateOf("") }
 
-    Column (Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally){
+    Column(
+        Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         TextField(
             value = myVal,
-            onValueChange = { myVal = it },
+            onValueChange = {
+                var text = it.replace(",", ".")
+                if (text.count { it -> it == '.' } <= 1) {
+                    myVal = text
+                }
+            },
             label = { Text(text = "Importe") }
         )
     }
@@ -153,9 +162,22 @@ A nivel funcional no permitas que se introduzcan caracteres que invaliden un nú
 fun Actividad5() {
     var myVal by rememberSaveable { mutableStateOf("") }
 
-    OutlinedTextField(
-        value = myVal,
-        onValueChange = { myVal = it },
-        label = { Text(text = "Importe") }
-    )
+        OutlinedTextField(
+            modifier = Modifier.padding(15.dp),
+            value = myVal,
+            onValueChange = { myVal = noDots(it) },
+            label = { Text(text = "Importe") },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color.Magenta
+            )
+        )
+}
+fun noDots(myVal: String): String{
+    val regex = "^\\d+(\\.\\d+)?$".toRegex()
+    var text = myVal
+    var newText = myVal.replace(",", ".")
+    if (newText.count { it -> it == '.' } <= 1 && regex.matches(newText)) {
+        text = newText
+    }
+    return text
 }
