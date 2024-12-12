@@ -161,11 +161,16 @@ A nivel funcional no permitas que se introduzcan caracteres que invaliden un nú
 @Composable
 fun Actividad5() {
     var myVal by rememberSaveable { mutableStateOf("") }
+    val regex = "^\\d+(\\.\\d+)?$".toRegex()
 
         OutlinedTextField(
             modifier = Modifier.padding(15.dp),
             value = myVal,
-            onValueChange = { myVal = noDots(it) },
+            onValueChange = {
+                if (regex.matches(it)) {
+                    myVal = noDots(it)
+                }
+                },
             label = { Text(text = "Importe") },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.Magenta
@@ -173,11 +178,9 @@ fun Actividad5() {
         )
 }
 fun noDots(myVal: String): String{
-    val regex = "^\\d+(\\.\\d+)?$".toRegex()
+
     var text = myVal
     var newText = myVal.replace(",", ".")
-    if (newText.count { it -> it == '.' } <= 1 && regex.matches(newText)) {
-        text = newText
-    }
+
     return text
 }
